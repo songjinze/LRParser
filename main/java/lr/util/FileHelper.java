@@ -13,12 +13,17 @@ import java.util.List;
  * 状态:ACTION符号:GOTO符号
  * 每个符号间使用#分割
  *
+ * 文法格式：
+ * 每一行为一个产生式
+ * 例如E->F*id
+ * 则写作：
+ * E:F#*#id
  */
 public class FileHelper {
-    public AnalysisTable getAnalysisTableFromFile(File file){
+    public AnalysisTable getAnalysisTableFromFile(File tableFile,File grammarFile){
         AnalysisTable analysisTable=new AnalysisTable();
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(tableFile));
             String temp=bufferedReader.readLine();
             String[] symbols=temp.split(":");
             List<Token> actionTokenList=new ArrayList<Token>();
@@ -44,6 +49,23 @@ public class FileHelper {
                 temp=bufferedReader.readLine();
             }
             bufferedReader.close();
+            BufferedReader grammarBufferedReader=new BufferedReader(new FileReader(grammarFile));
+            temp=grammarBufferedReader.readLine();
+            int count=1;
+            while(temp!=null){
+                String[]grammarStrs=temp.split(":");
+                Token left=new Token(grammarStrs[0]);
+                String[] right=grammarStrs[1].split("#");
+                List<Token> rightTokens=new ArrayList<Token>();
+                for(String str:right){
+                    rightTokens.add(new Token(str));
+                }
+                Grammar grammar=new Grammar(left,rightTokens);
+                analysisTable.addGrammar(count,grammar);
+                count++;
+                temp=grammarBufferedReader.readLine();
+            }
+            grammarBufferedReader.close();
         }catch(IOException e){
             FileHelper.errorRecord(e.getMessage());
         }
@@ -52,5 +74,9 @@ public class FileHelper {
 
     public static void errorRecord(String message){
         // TODO 添加错误信息记录
+    }
+
+    public static void outputRecord(String message){
+        // TODO 添加输出信息
     }
 }

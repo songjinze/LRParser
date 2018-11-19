@@ -1,6 +1,6 @@
 package lr.util;
 
-public class GotoParseState {
+class GotoParseState {
     int toStateId;
 
     public GotoParseState(){

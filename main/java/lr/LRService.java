@@ -1,5 +1,6 @@
 package lr;
 
+import lr.exception.LRException;
 import lr.util.AnalysisTable;
 import lr.util.Token;
 
@@ -12,5 +13,5 @@ public interface LRService {
      * @param analysisTable 语法分析表
      * @return
      */
-    boolean lr0(List<Token> tokenList, AnalysisTable analysisTable);
+    boolean lr0(List<Token> tokenList, AnalysisTable analysisTable) throws LRException;
 }
