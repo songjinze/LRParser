@@ -51,12 +51,17 @@ public class AnalysisTable {
             }
             row.gotoParseStates.add(gotoParseState);
         }
+        rows.add(row);
     }
 
     class Row{
         int state;
         List<ActionParseState> actionParseStates;
         List<GotoParseState> gotoParseStates;
+        Row(){
+            actionParseStates=new ArrayList<ActionParseState>();
+            gotoParseStates=new ArrayList<GotoParseState>();
+        }
     }
 
     public String action(int state,Token token){

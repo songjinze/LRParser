@@ -1,6 +1,5 @@
 package lr;
 
-import lr.exception.LRException;
 import lr.util.AnalysisTable;
 import lr.util.FileHelper;
 import lr.util.Grammar;
@@ -12,7 +11,7 @@ import java.util.Stack;
 
 public class LRServiceImpl implements LRService{
 
-    public boolean lr0(List<Token> tokenList, AnalysisTable analysisTable) throws LRException {
+    public boolean lr0(List<Token> tokenList, AnalysisTable analysisTable)  {
         Stack<Integer> stack=new Stack<Integer>();
         int n=0;
         Token a=tokenList.get(n);
@@ -20,11 +19,12 @@ public class LRServiceImpl implements LRService{
         while(true){
             int s=stack.peek();
             String actionParse=analysisTable.action(s,a);
-            if(actionParse.charAt(0)=='s'){
+            if((!actionParse.equals(""))&&actionParse.charAt(0)=='s'){
                 stack.push(Integer.parseInt(actionParse.substring(1)));
-                FileHelper.outputRecord("put stack");
+                FileHelper.outputRecord("put stack"+actionParse.substring(1));
+                a=tokenList.get(++n);
             }
-            else if(actionParse.charAt(0)=='r'){
+            else if((!actionParse.equals(""))&&actionParse.charAt(0)=='r'){
                 int grammarIndex=Integer.parseInt(actionParse.substring(1));
                 Grammar grammar=analysisTable.getGrammarMap().get(grammarIndex);
                 Token left=grammar.getLeft();
@@ -45,9 +45,15 @@ public class LRServiceImpl implements LRService{
                 break;
             }
             else {
-                throw new LRException();
+                // TODO 添加错误修改
+                FileHelper.errorRecord("grammar error");
+                break;
             }
         }
         return true;
+    }
+
+    public AnalysisTable getAnalysisTableFromFiles(File tableFile, File grammarFile) {
+        return FileHelper.getAnalysisTableFromFile(tableFile,grammarFile);
     }
 }

@@ -1,9 +1,6 @@
 package lr.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +17,7 @@ import java.util.List;
  * E:F#*#id
  */
 public class FileHelper {
-    public AnalysisTable getAnalysisTableFromFile(File tableFile,File grammarFile){
+    public static AnalysisTable getAnalysisTableFromFile(File tableFile,File grammarFile){
         AnalysisTable analysisTable=new AnalysisTable();
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(tableFile));
@@ -36,15 +33,16 @@ public class FileHelper {
             }
             for(String gotoTokenSymbol:gotoTokenSymbols){
                 Token token=new Token(gotoTokenSymbol);
-                actionTokenList.add(token);
+                gotoTokenList.add(token);
             }
             analysisTable.initActionTokenList(actionTokenList);
             analysisTable.initGotoTokenList(gotoTokenList);
+            temp=bufferedReader.readLine();
             while(temp!=null){
                 String[]parsers=temp.split(":");
                 int state=Integer.parseInt(parsers[0]);
-                String[]actionSymbols=parsers[1].split("#");
-                String[]gotoSymbols=parsers[2].split("#");
+                String[]actionSymbols=parsers[1].split("#",actionTokenList.size());
+                String[]gotoSymbols=parsers[2].split("#",gotoTokenList.size());
                 analysisTable.addRow(state,actionSymbols,gotoSymbols);
                 temp=bufferedReader.readLine();
             }
@@ -71,12 +69,33 @@ public class FileHelper {
         }
         return analysisTable;
     }
-
+    private static FileHelper fileHelper=new FileHelper();
+    private String projectPath=this.getClass().getClassLoader().getResource("").getFile();
     public static void errorRecord(String message){
-        // TODO 添加错误信息记录
+        File file=new File(fileHelper.projectPath+"/errorLog.txt");
+        try {
+            writeFile(file,message);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
-
+    private static void writeFile(File file,String message) throws IOException{
+        if(!file.exists()){
+            file.createNewFile();
+        }
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file,true));
+        bufferedWriter.write("");
+        bufferedWriter.newLine();
+        bufferedWriter.append(message);
+        bufferedWriter.flush();
+        bufferedWriter.close();
+    }
     public static void outputRecord(String message){
-        // TODO 添加输出信息
+        File file=new File(fileHelper.projectPath+"/outputLog.txt");
+        try{
+            writeFile(file,message);
+        }catch(IOException e){
+            FileHelper.errorRecord(e.getMessage());
+        }
     }
 }
